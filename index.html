@@ -3,267 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tetonor Web - Juega y Aprende</title>
+    <title>Tetonor Clásico</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #f0f2f5; padding: 20px; color: #333; }
-        .game-container { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; margin-bottom: 20px; }
-        h1 { color: #007bff; margin-bottom: 20px; }
-        .stats { display: flex; justify-content: space-between; width: 100%; margin-bottom: 20px; font-weight: bold; color: #555; }
-        .grid { display: grid; grid-template-columns: repeat(5, 60px); grid-gap: 10px; align-items: center; justify-items: center; }
-        .cell { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
-        input { width: 45px; height: 45px; text-align: center; border: 2px solid #ddd; border-radius: 8px; font-size: 1.2rem; color: #007bff; transition: 0.3s; }
-        input:focus { border-color: #007bff; outline: none; box-shadow: 0 0 5px rgba(0,123,255,0.5); }
-        .op { color: #888; font-size: 1.4rem; }
-        .res { color: #333; background: #e9ecef; border-radius: 8px; }
+        :root { --primary: #0056b3; --bg: #f4f4f9; --cell-size: 80px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; color: #333; }
+        
+        .game-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); max-width: 600px; width: 100%; text-align: center; }
+        h1 { margin-top: 0; color: #444; letter-spacing: 1px; }
+        
+        /* Grid del juego */
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
+        .cell { border: 2px solid #333; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; position: relative; background: #fff; border-radius: 4px; padding-bottom: 5px; }
+        .res-num { font-size: 1.5rem; font-weight: 800; margin-top: 5px; color: #000; }
+        
+        .input-box { width: 100%; display: flex; justify-content: space-evenly; border-top: 1px solid #aaa; padding-top: 5px; }
+        input { width: 35px; border: none; text-align: center; font-size: 1.1rem; font-weight: bold; color: var(--primary); outline: none; background: transparent; border-bottom: 2px solid transparent; }
+        input:focus { border-bottom: 2px solid var(--primary); }
+        
+        .op-sign { position: absolute; bottom: 35px; font-size: 0.9rem; font-weight: bold; color: #007bff; background: white; padding: 0 4px; }
+
+        /* Lista de números abajo */
+        .list-container { margin-top: 15px; border: 2px solid #555; padding: 5px; background: #eee; }
+        .list-title { font-size: 0.8rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
+        .number-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
+        .num-item { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border: 1px solid #999; background: white; font-weight: bold; font-size: 0.9rem; cursor: pointer; }
+        .num-used { background-color: #aaa; color: #555; text-decoration: line-through; }
+
+        /* Controles */
         .controls { margin-top: 25px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-        .btn { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; color: white; }
+        .btn { padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; font-size: 0.9rem; }
         .btn-check { background: #28a745; }
         .btn-hint { background: #ffc107; color: #333; }
-        .btn-reset { background: #6c757d; }
-        .btn-new { background: #007bff; }
+        .btn-new { background: #6c757d; }
         .btn-info { background: #17a2b8; }
-        .btn:hover { opacity: 0.9; transform: scale(1.05); }
-        #message { margin-top: 15px; font-weight: bold; min-height: 24px; }
-        .correct { border-color: #28a745 !important; background-color: #d4edda; color: #155724; }
+        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
 
-        /* Estilos para la sección de información */
-        #info-section {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 600px;
-            margin-top: 20px;
-            text-align: left;
-            display: none; /* Oculto por defecto */
-        }
-        #info-section h2 { color: #007bff; margin-bottom: 15px; }
-        #info-section h3 { color: #333; margin-top: 20px; margin-bottom: 10px; }
-        #info-section ul { list-style-type: disc; margin-left: 20px; margin-bottom: 15px; }
-        #info-section ol { list-style-type: decimal; margin-left: 20px; margin-bottom: 15px; }
-        #info-section p { line-height: 1.6; margin-bottom: 10px; }
+        #msg { margin-top: 15px; font-weight: bold; height: 24px; }
+        .correct-cell { border-color: #28a745; background-color: #e8f5e9; }
+        .wrong-cell { border-color: #dc3545; background-color: #f8d7da; }
+
+        /* Sección de Ayuda (Oculta) */
+        #info-section { display: none; background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 15px; margin-top: 20px; border-radius: 8px; text-align: left; font-size: 0.9rem; }
+        #info-section h3 { margin-top: 0; }
+        #info-section ul { padding-left: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="game-container">
-        <h1>Tetonor Web</h1>
-        
-        <div class="stats">
-            <div>Tiempo: <span id="timer">00:00</span></div>
-            <div id="level">Nivel: Aleatorio</div>
-        </div>
+<div class="game-card">
+    <h1>TETONOR</h1>
+    
+    <div id="game-grid" class="grid"></div>
+    
+    <div class="list-container">
+        <div class="list-title">Números Disponibles (Pista)</div>
+        <div id="num-list" class="number-list"></div>
+    </div>
 
-        <div id="grid" class="grid"></div>
-        
-        <div id="message"></div>
+    <div id="msg"></div>
 
-        <div class="controls">
-            <button class="btn btn-check" onclick="checkGame()">Comprobar</button>
-            <button class="btn btn-hint" onclick="getHint()">💡 Pista</button>
-            <button class="btn btn-reset" onclick="resetCurrent()">Reiniciar</button>
-            <button class="btn btn-new" onclick="initGame()">Nuevo Juego</button>
-            <button class="btn btn-info" onclick="toggleInfo()">ℹ️ Info / Ayuda</button>
-        </div>
+    <div class="controls">
+        <button class="btn btn-check" onclick="checkAll()">Comprobar</button>
+        <button class="btn btn-hint" onclick="giveHint()">💡 Pista</button>
+        <button class="btn btn-new" onclick="generateGame()">Nuevo Juego</button>
+        <button class="btn btn-info" onclick="toggleInfo()">❓ Ayuda</button>
     </div>
 
     <div id="info-section">
-        <h2>Reglas del Juego Tetonor</h2>
-        <p>El **Tetonor** es un desafío matemático que pondrá a prueba tu lógica y tus habilidades numéricas. El objetivo es simple:</p>
-        
-        <h3>Objetivo:</h3>
+        <h3>Cómo jugar:</h3>
         <ul>
-            <li>Rellenar todas las casillas vacías (las que tienen un cuadro de texto) con números del **1 al 9**.</li>
-            <li>Debes asegurarte de que todas las operaciones matemáticas (sumas, restas, multiplicaciones) sean correctas, tanto en horizontal como en vertical.</li>
-            <li>Se deben respetar los operadores y el orden de izquierda a derecha en las filas y de arriba hacia abajo en las columnas.</li>
+            <li>El objetivo es completar las casillas inferiores de cada cuadro.</li>
+            <li>El número grande arriba es el <strong>Resultado</strong>.</li>
+            <li>El signo azul (<strong>+</strong> o <strong>×</strong>) indica la operación.</li>
+            <li>Debes encontrar qué par de números, al sumarse o multiplicarse, dan ese resultado.</li>
+            <li><strong>Importante:</strong> Los números que uses deben salir de la "Lista de Números Disponibles" que ves abajo.</li>
+            <li>¡Cada número de la lista se usa solo una vez!</li>
         </ul>
-
-        <h3>Consejos para Resolver:</h3>
-        <ol>
-            <li>**Empieza por lo fácil:** Busca las operaciones que ya tienen la mayoría de los números revelados o que solo tienen una casilla vacía. Por ejemplo, si tienes "5 + [ ] = 8", sabes que el número es 3.</li>
-            <li>**Multiplicaciones y divisiones:** A menudo son las más restrictivas. Si tienes "X * [ ] = Y", las opciones para el número desconocido suelen ser pocas. ¡Aprovéchalas!</li>
-            <li>**Intersecciones:** Un número puede ser parte de una operación horizontal y una vertical. Si encuentras un número en una operación, verifica cómo afecta a la otra operación que lo cruza.</li>
-            <li>**Prueba y error (con cabeza):** Si estás atascado, haz una suposición educada para una casilla y mira si puedes seguir resolviendo. Si llegas a una contradicción, sabrás que tu suposición original era incorrecta.</li>
-            <li>**Utiliza el botón "Reiniciar":** Si crees que te has equivocado en alguna parte, puedes borrar tus entradas y volver a empezar con el mismo tablero.</li>
-            <li>**El botón "Pista":** Si estás muy perdido, el botón "💡 Pista" te revelará una de las respuestas correctas. ¡Úsalo con moderación para desafiarte a ti mismo!</li>
-        </ol>
-        <p>¡Mucha suerte y diviértete mejorando tu agilidad mental!</p>
     </div>
+</div>
 
-    <script>
-        let solution = {};
-        let seconds = 0;
-        let timerInterval;
+<script>
+    let solution = [];
+    let availableNumbers = [];
 
-        function startTimer() {
-            clearInterval(timerInterval);
-            seconds = 0;
-            updateTimerDisplay();
-            timerInterval = setInterval(() => {
-                seconds++;
-                updateTimerDisplay();
-            }, 1000);
-        }
+    function generateGame() {
+        const grid = document.getElementById('game-grid');
+        const listDiv = document.getElementById('num-list');
+        const msg = document.getElementById('msg');
+        grid.innerHTML = '';
+        listDiv.innerHTML = '';
+        msg.textContent = '';
+        
+        // Limpiar estilos anteriores
+        document.getElementById('info-section').style.display = 'none';
 
-        function updateTimerDisplay() {
-            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-            const s = (seconds % 60).toString().padStart(2, '0');
-            document.getElementById('timer').textContent = `${m}:${s}`;
-        }
-
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-        function initGame() {
-            const grid = document.getElementById('grid');
-            const message = document.getElementById('message');
-            grid.innerHTML = '';
-            message.textContent = '';
-            startTimer();
-
-            // Lógica de generación mejorada
-            // Aseguramos que los números sean válidos y permitan soluciones
-            let f1_a, f1_b, f1_sum, col1_d, col1_res, f2_e, f2_f;
-
-            do { // Loop para asegurar que la división sea posible y los resultados estén entre 1 y 9
-                f1_a = getRandomInt(2, 9); // Para que la multiplicación sea interesante
-                f1_b = getRandomInt(1, 9);
-                f1_sum = f1_a + f1_b;
-
-                col1_d = getRandomInt(2, 5); // Para que la multiplicación no sea demasiado grande
-                col1_res = f1_a * col1_d;
-
-                f2_e = getRandomInt(1, 9); 
-                f2_f = col1_d - f2_e; 
-                // Asegurarse que f2_f sea positivo y distinto de 0
-            } while (f1_sum > 18 || col1_res > 81 || f2_f <= 0 || f2_f > 9); // Ajuste de rangos para la validez
-
-            solution = { 
-                f1_b: f1_b, 
-                col1_d: col1_d, 
-                f2_e: f2_e, 
-                f2_f: f2_f,
-                sum_mid: f1_b + f2_e,
-                total: f1_sum + f2_f
-            };
+        // 1. Generar pares de números para 8 celdas (16 números en total)
+        availableNumbers = [];
+        solution = [];
+        
+        // Generamos 8 pares lógicos
+        for(let i=0; i<8; i++) {
+            // Números base entre 2 y 12 para que las multiplicaciones no sean gigantes
+            let n1 = Math.floor(Math.random() * 10) + 2; 
+            let n2 = Math.floor(Math.random() * 10) + 2;
             
-            // Ajustar si las sumas finales se salen del rango 1-18
-            if (solution.sum_mid > 18) { // Si la suma central es muy alta, regenerar
-                return initGame(); 
-            }
-            if (solution.total > 18) { // Si la suma final es muy alta, regenerar
-                return initGame();
-            }
+            // Decidir operación (50% prob)
+            let isMult = Math.random() > 0.5;
+            let result = isMult ? n1 * n2 : n1 + n2;
 
-
-            const cells = [
-                {type: 'val', val: f1_a}, {type: 'op', val: '+'}, {type: 'input', id: 'f1_b'}, {type: 'op', val: '='}, {type: 'res', val: f1_sum},
-                {type: 'op', val: '×'}, {type: 'empty'}, {type: 'op', val: '+'}, {type: 'empty'}, {type: 'op', val: '+'},
-                {type: 'input', id: 'col1_d'}, {type: 'op', val: '-'}, {type: 'input', id: 'f2_e'}, {type: 'op', val: '='}, {type: 'input', id: 'f2_f'},
-                {type: 'op', val: '='}, {type: 'empty'}, {type: 'op', val: '='}, {type: 'empty'}, {type: 'op', val: '='},
-                {type: 'res', val: col1_res}, {type: 'empty'}, {type: 'input', id: 'sum_mid'}, {type: 'empty'}, {type: 'input', id: 'total'}
-            ];
-
-            cells.forEach(cell => {
-                const div = document.createElement('div');
-                div.className = 'cell';
-                if(cell.type === 'val' || cell.type === 'res') {
-                    div.classList.add('res');
-                    div.textContent = cell.val;
-                } else if(cell.type === 'op') {
-                    div.classList.add('op');
-                    div.textContent = cell.val;
-                } else if(cell.type === 'input') {
-                    const input = document.createElement('input');
-                    input.type = 'number';
-                    input.min = "1";
-                    input.max = "9";
-                    input.maxLength = "1"; // Para asegurar solo un dígito visualmente
-                    input.id = cell.id;
-                    div.appendChild(input);
-                }
-                grid.appendChild(div);
-            });
+            // Guardar solución
+            solution.push({ n1, n2, result, isMult });
+            
+            // Guardar números para la lista visual
+            availableNumbers.push(n1, n2);
         }
 
-        function checkGame() {
-            let allFilled = true;
-            let correctCount = 0;
-            let totalInputs = 0;
-            
-            for (let key in solution) {
-                totalInputs++;
-                const input = document.getElementById(key);
-                if (input && input.value !== '') { // Asegurarse de que el input exista y no esté vacío
-                    if (parseInt(input.value) === solution[key]) {
-                        input.classList.add('correct');
-                        correctCount++;
-                    } else {
-                        input.classList.remove('correct');
-                        allFilled = false; // Aunque esté lleno, si es incorrecto, no está "bien"
-                    }
+        // Ordenar lista de números para mostrar abajo
+        availableNumbers.sort((a, b) => a - b);
+
+        // 2. Dibujar la cuadrícula
+        solution.forEach((sol, i) => {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.innerHTML = `
+                <div class="res-num">${sol.result}</div>
+                <div class="op-sign">${sol.isMult ? '×' : '+'}</div>
+                <div class="input-box">
+                    <input type="number" class="user-in" data-idx="${i}" data-pos="1" placeholder="?">
+                    <input type="number" class="user-in" data-idx="${i}" data-pos="2" placeholder="?">
+                </div>
+            `;
+            grid.appendChild(cell);
+        });
+
+        // 3. Dibujar la lista de números abajo
+        availableNumbers.forEach(num => {
+            const span = document.createElement('div');
+            span.className = 'num-item';
+            span.textContent = num;
+            listDiv.appendChild(span);
+        });
+    }
+
+    function checkAll() {
+        const inputs = document.querySelectorAll('.user-in');
+        let allCorrect = true;
+
+        solution.forEach((sol, i) => {
+            const input1 = document.querySelector(`input[data-idx="${i}"][data-pos="1"]`);
+            const input2 = document.querySelector(`input[data-idx="${i}"][data-pos="2"]`);
+            const val1 = parseInt(input1.value);
+            const val2 = parseInt(input2.value);
+            const parent = input1.closest('.cell');
+
+            let isPairCorrect = false;
+
+            if (val1 && val2) {
+                // Verificar si la operación matemática es correcta
+                let mathCorrect = false;
+                if (sol.isMult) {
+                    if (val1 * val2 === sol.result) mathCorrect = true;
                 } else {
-                    input.classList.remove('correct');
-                    allFilled = false; // Si hay alguno vacío, no está todo completo
+                    if (val1 + val2 === sol.result) mathCorrect = true;
+                }
+
+                // Verificar si los números usados estaban en la lista (simplificado para jugabilidad: 
+                // solo validamos que la matemática sea correcta para este par)
+                if (mathCorrect) isPairCorrect = true;
+            }
+
+            if(isPairCorrect) {
+                parent.classList.add('correct-cell');
+                parent.classList.remove('wrong-cell');
+            } else {
+                allCorrect = false;
+                if (val1 || val2) { // Solo marcar error si intentaron escribir algo
+                    parent.classList.add('wrong-cell');
+                    parent.classList.remove('correct-cell');
                 }
             }
+        });
 
-            const msg = document.getElementById('message');
-            if (correctCount === totalInputs && allFilled) { // Todos llenos y todos correctos
-                clearInterval(timerInterval);
-                msg.textContent = `¡Felicidades! Lo lograste en ${document.getElementById('timer').textContent}`;
-                msg.style.color = "green";
-                setTimeout(initGame, 3000); // Nuevo juego después de 3 segundos
-            } else {
-                msg.textContent = "Revisa los campos incorrectos o vacíos...";
-                msg.style.color = "red";
-            }
+        const msg = document.getElementById('msg');
+        if(allCorrect) {
+            msg.textContent = "¡FELICIDADES! Has resuelto el tablero.";
+            msg.style.color = "green";
+        } else {
+            msg.textContent = "Hay errores, revisa las casillas rojas.";
+            msg.style.color = "#dc3545";
         }
+        
+        updateNumberListStrike();
+    }
 
-        function getHint() {
-            const keys = Object.keys(solution);
-            const emptyInputs = keys.filter(k => {
-                const input = document.getElementById(k);
-                return input && input.value === '';
-            });
+    // Tachar números usados en la lista
+    function updateNumberListStrike() {
+        // Obtenemos todos los valores escritos por el usuario
+        const inputs = document.querySelectorAll('.user-in');
+        let usedValues = [];
+        inputs.forEach(inp => {
+            if(inp.value) usedValues.push(parseInt(inp.value));
+        });
+
+        // Reiniciamos visualmente la lista
+        const listItems = document.querySelectorAll('.num-item');
+        listItems.forEach(item => item.classList.remove('num-used'));
+
+        // Tachamos los que coincidan (lógica visual simple)
+        listItems.forEach(item => {
+            const val = parseInt(item.textContent);
+            const foundIndex = usedValues.indexOf(val);
+            if(foundIndex !== -1) {
+                item.classList.add('num-used');
+                usedValues.splice(foundIndex, 1); // Remover para no tachar repetidos incorrectamente
+            }
+        });
+    }
+
+    function giveHint() {
+        const inputs = Array.from(document.querySelectorAll('.user-in')).filter(i => !i.value);
+        if(inputs.length > 0) {
+            // Elegir una casilla vacía al azar
+            const target = inputs[Math.floor(Math.random() * inputs.length)];
+            const idx = target.getAttribute('data-idx');
+            const pos = target.getAttribute('data-pos');
             
-            if (emptyInputs.length > 0) {
-                const randomKey = emptyInputs[Math.floor(Math.random() * emptyInputs.length)];
-                const input = document.getElementById(randomKey);
-                input.value = solution[randomKey];
-                input.classList.add('correct');
-                document.getElementById('message').textContent = "¡Una pista revelada!";
-                document.getElementById('message').style.color = "blue";
-            } else {
-                document.getElementById('message').textContent = "¡Ya están todos los números en el tablero!";
-                document.getElementById('message').style.color = "orange";
-            }
+            // Rellenar con la solución correcta
+            target.value = pos == "1" ? solution[idx].n1 : solution[idx].n2;
+            
+            // Feedback visual
+            target.style.backgroundColor = "#fff3cd";
+            updateNumberListStrike();
+        } else {
+            document.getElementById('msg').textContent = "¡Ya no hay casillas vacías!";
         }
+    }
 
-        function resetCurrent() {
-            for (let key in solution) {
-                const input = document.getElementById(key);
-                if (input) { // Asegurarse de que el input exista
-                    input.value = '';
-                    input.classList.remove('correct');
-                }
-            }
-            document.getElementById('message').textContent = "Tablero limpiado.";
-            document.getElementById('message').style.color = "black";
+    function toggleInfo() {
+        const info = document.getElementById('info-section');
+        if (info.style.display === 'block') {
+            info.style.display = 'none';
+        } else {
+            info.style.display = 'block';
         }
+    }
 
-        function toggleInfo() {
-            const infoSection = document.getElementById('info-section');
-            if (infoSection.style.display === 'none' || infoSection.style.display === '') {
-                infoSection.style.display = 'block';
-            } else {
-                infoSection.style.display = 'none';
-            }
+    // Detectar cambios en inputs para actualizar tachado de lista
+    document.addEventListener('input', (e) => {
+        if(e.target.classList.contains('user-in')) {
+            updateNumberListStrike();
         }
+    });
 
-        window.onload = initGame;
-    </script>
+    window.onload = generateGame;
+</script>
+
 </body>
 </html>
